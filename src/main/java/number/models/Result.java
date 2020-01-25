@@ -1,6 +1,6 @@
 package number.models;
 
-import java.util.List;
+import java.util.Set;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -27,7 +27,7 @@ public class Result {
     private Draw mostRecentDraw;
     
     @SerializedName("PreviousDraws")
-    private List<Draw> previousDraws;
+    private Set<Draw> previousDraws;
 
     public Integer getDrawGameId() {
         return drawGameId;
@@ -85,11 +85,11 @@ public class Result {
         this.mostRecentDraw = mostRecentDraw;
     }
 
-    public List<Draw> getPreviousDraws() {
+    public Set<Draw> getPreviousDraws() {
         return previousDraws;
     }
 
-    public void setPreviousDraws(List<Draw> previousDraws) {
+    public void setPreviousDraws(Set<Draw> previousDraws) {
         this.previousDraws = previousDraws;
     }
 }
