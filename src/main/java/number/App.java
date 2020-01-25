@@ -5,13 +5,13 @@ package number;
 
 import java.io.IOException;
 
-import number.data.DataManagement;
+import number.data.DataManager;
 
 public class App {
 
     public static void main(String[] args) {
         try {
-            DataManagement.downloadData("result.json");
+            DataManager.downloadData("result.json");
         } catch (IOException e) {
             e.printStackTrace();
         }
