@@ -25,4 +25,52 @@ public class WinningNumbers {
     public String toString() {
         return String.format("[%s, %s, %s, %s, %s, %s]", zero, one, two, three, four, five);
     }
+
+    public WinningNumber getZero() {
+        return zero;
+    }
+
+    public void setZero(WinningNumber zero) {
+        this.zero = zero;
+    }
+
+    public WinningNumber getOne() {
+        return one;
+    }
+
+    public void setOne(WinningNumber one) {
+        this.one = one;
+    }
+
+    public WinningNumber getTwo() {
+        return two;
+    }
+
+    public void setTwo(WinningNumber two) {
+        this.two = two;
+    }
+
+    public WinningNumber getThree() {
+        return three;
+    }
+
+    public void setThree(WinningNumber three) {
+        this.three = three;
+    }
+
+    public WinningNumber getFour() {
+        return four;
+    }
+
+    public void setFour(WinningNumber four) {
+        this.four = four;
+    }
+
+    public WinningNumber getFive() {
+        return five;
+    }
+
+    public void setFive(WinningNumber five) {
+        this.five = five;
+    }
 }

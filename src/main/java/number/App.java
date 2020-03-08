@@ -4,16 +4,31 @@
 package number;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import number.algorithms.BuildRelation;
 import number.data.DataManager;
+import number.models.Numbers;
 
 public class App {
+    private static Logger logger = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
+        logger.info("START");
         try {
-            DataManager.downloadData("result.json");
+            Numbers numbers = DataManager.getData("result.json");
+            BuildRelation buildRelation = new BuildRelation(numbers);
+            LinkedList<int[]> list = buildRelation.getList();
+            for(int[] i : list) {
+                logger.info(Arrays.toString(i));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        logger.info("DONE");
     }
 }

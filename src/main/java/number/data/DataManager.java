@@ -2,7 +2,6 @@ package number.data;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,28 +13,32 @@ import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import number.models.Result;
+import number.models.Numbers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class DataManagement {
-    private static Logger logger = LoggerFactory.getLogger(DataManagement.class);
+/**
+ * DataManager will download data from the API and save it to fileName
+ * If fileName is missing, default fileName FILE_NAME = "result.json" will be used
+ */
+public class DataManager {
+    private static Logger logger = LoggerFactory.getLogger(DataManager.class);
     private static Gson gson = new Gson();
 
     private static String TEMPLATE = number.constants.URL.template;
     private static String FILE_NAME = "result.json";
-    private static Result RESULT;
+    private static Numbers RESULT;
 
-    public static Result getResult(String fileName) throws IOException {
+    public static Numbers getData(String fileName) throws IOException {
         if (RESULT == null) {
             downloadData(fileName);
         }
         return RESULT;
     }
 
-    public static Result getResult() throws IOException {
-        return getResult(FILE_NAME);
+    public static Numbers getData() throws IOException {
+        return getData(FILE_NAME);
     }
 
     public static void downloadData() throws IOException {
@@ -61,7 +64,7 @@ public class DataManagement {
                 break;
             }
             JsonElement jsonElement = JsonParser.parseString(response.body().string());
-            Result responseData = gson.fromJson(jsonElement, Result.class);
+            Numbers responseData = gson.fromJson(jsonElement, Numbers.class);
             if (responseData.getMostRecentDraw() == null) {
                 break;
             }
@@ -90,9 +93,9 @@ public class DataManagement {
         logger.debug("Object is writen to " + fileName);
     }
 
-    public static Result loadFromFile(String fileName) throws IOException {
+    public static Numbers loadFromFile(String fileName) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
-        RESULT = gson.fromJson(bufferedReader, Result.class);
+        RESULT = gson.fromJson(bufferedReader, Numbers.class);
         bufferedReader.close();
         return RESULT;
     }

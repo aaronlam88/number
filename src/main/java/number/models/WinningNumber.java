@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class WinningNumber {
     @SerializedName("Number")
-    private String number;
+    private Integer number;
 
     @SerializedName("IsSpecial")
     private Boolean isSpecial;
@@ -12,11 +12,11 @@ public class WinningNumber {
     @SerializedName("Name")
     private String name;
 
-    public String getNumber() {
+    public Integer getNumber() {
         return number;
     }
 
-    public void setNumber(String number) {
+    public void setNumber(Integer number) {
         this.number = number;
     }
 
@@ -38,6 +38,6 @@ public class WinningNumber {
 
     @Override
     public String toString() {
-        return number;
+        return number+"";
     }
 }
