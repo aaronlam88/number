@@ -16,14 +16,22 @@ public class BuildRelation {
     private static Logger logger = LoggerFactory.getLogger(DataManager.class);
     private Numbers numbers;
     private LinkedList<int[]> list = new LinkedList<>();
+    private int countNums = 0;
+    private int countMega = 0;
 
     private void insertList(int[] array, WinningNumber number) {
         if(number.getIsSpecial()) {
+            if (countMega < number.getNumber()) {
+                countMega = number.getNumber();
+            }
             array[5] = number.getNumber();
         } else {
             for(int i = 0; i < 5; ++i) {
                 if(array[i] == 0) {
                     array[i] = number.getNumber();
+                    if (number.getNumber() > countNums) {
+                        countNums = number.getNumber();
+                    }
                     break;
                 }
             }
@@ -50,5 +58,33 @@ public class BuildRelation {
 
     public LinkedList<int[]> getList() {
         return this.list;
+    }
+
+    public void setList(LinkedList<int[]> list) {
+        this.list = list;
+    }
+
+    public int getCountNums() {
+        return countNums;
+    }
+
+    public void setCountNums(int countNums) {
+        this.countNums = countNums;
+    }
+
+    public int getCountMega() {
+        return countMega;
+    }
+
+    public void setCountMega(int countMega) {
+        this.countMega = countMega;
+    }
+
+    public Numbers getNumbers() {
+        return numbers;
+    }
+
+    public void setNumbers(Numbers numbers) {
+        this.numbers = numbers;
     }
 }

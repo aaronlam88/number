@@ -24,10 +24,12 @@ public class App {
             BuildRelation buildRelation = new BuildRelation(numbers);
             LinkedList<int[]> list = buildRelation.getList();
             for(int[] i : list) {
-                logger.info(Arrays.toString(i));
+                System.out.println(Arrays.toString(i));
             }
+            System.out.println("Nums count: " + buildRelation.getCountNums());
+            System.out.println("Mega count: " + buildRelation.getCountMega());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info(e.getLocalizedMessage());
         }
         logger.info("DONE");
     }
