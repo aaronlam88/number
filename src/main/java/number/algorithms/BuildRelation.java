@@ -1,33 +1,31 @@
 package number.algorithms;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
 
 import number.data.DataManager;
-import number.models.Draw;
-import number.models.Numbers;
-import number.models.WinningNumber;
-import number.models.WinningNumbers;
+import number.models.number.Draw;
+import number.models.number.Numbers;
+import number.models.number.WinningNumber;
+import number.models.number.WinningNumbers;
 
 public class BuildRelation {
-    private static Logger logger = LoggerFactory.getLogger(DataManager.class);
     private Numbers numbers;
-    private LinkedList<int[]> list = new LinkedList<>();
+    private List<int[]> list = new LinkedList<>();
     private int countNums = 0;
     private int countMega = 0;
 
     private void insertList(int[] array, WinningNumber number) {
-        if(number.getIsSpecial()) {
+        if (Boolean.TRUE.equals(number.getIsSpecial())) {
             if (countMega < number.getNumber()) {
                 countMega = number.getNumber();
             }
             array[5] = number.getNumber();
         } else {
-            for(int i = 0; i < 5; ++i) {
-                if(array[i] == 0) {
+            for (int i = 0; i < 5; ++i) {
+                if (array[i] == 0) {
                     array[i] = number.getNumber();
                     if (number.getNumber() > countNums) {
                         countNums = number.getNumber();
@@ -38,9 +36,9 @@ public class BuildRelation {
         }
     }
 
-    public BuildRelation(Numbers numbers) throws IOException {
+    public BuildRelation(Numbers numbers) throws IOException, URISyntaxException {
         if (numbers == null) {
-            numbers = DataManager.getData();
+            numbers = DataManager.getInstance().getData();
         }
         this.numbers = numbers;
         for (Draw draw : this.numbers.getPreviousDraws()) {
@@ -56,11 +54,11 @@ public class BuildRelation {
         }
     }
 
-    public LinkedList<int[]> getList() {
+    public List<int[]> getList() {
         return this.list;
     }
 
-    public void setList(LinkedList<int[]> list) {
+    public void setList(List<int[]> list) {
         this.list = list;
     }
 

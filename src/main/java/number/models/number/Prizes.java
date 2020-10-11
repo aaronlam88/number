@@ -1,8 +1,15 @@
-package number.models;
+package number.models.number;
+
+import java.io.Serializable;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Prizes {
+import lombok.Data;
+
+@Data
+public class Prizes implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @SerializedName("1")
     private Prize one;
 

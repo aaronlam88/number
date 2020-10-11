@@ -1,102 +1,88 @@
 package number.data;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import number.models.Numbers;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+import lombok.extern.slf4j.Slf4j;
+import number.constants.URLs;
+import number.models.number.Numbers;
+import number.utils.http.HttpAdapter;
+import number.utils.io.FileIO;
 import okhttp3.Response;
 
 /**
- * DataManager will download data from the API and save it to fileName
- * If fileName is missing, default fileName FILE_NAME = "result.json" will be used
+ * DataManager will download data from the API and save it to fileName. If
+ * fileName is missing, default fileName FILE_NAME = "result.json" will be used.
+ * After parsing the data file, the data will be cached in Numbers result
+ * variable. To get data, call getData() or getData(FILE_NAME).
  */
+@Slf4j
 public class DataManager {
-    private static Logger logger = LoggerFactory.getLogger(DataManager.class);
-    private static Gson gson = new Gson();
+    private static DataManager instance;
 
-    private static String TEMPLATE = number.constants.URL.template;
-    private static String FILE_NAME = "result.json";
-    private static Numbers RESULT;
+    private DataManager() {
+    }
 
-    public static Numbers getData(String fileName) throws IOException {
-        if (RESULT == null) {
-            downloadData(fileName);
+    private DataManager(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public static synchronized DataManager getInstance(String fileName) {
+        if (instance == null) {
+            instance = new DataManager(fileName);
         }
-        return RESULT;
+        return instance;
     }
 
-    public static Numbers getData() throws IOException {
-        return getData(FILE_NAME);
-    }
-
-    public static void downloadData() throws IOException {
-        downloadData(FILE_NAME);
-    }
-
-    public static void downloadData(String fileName) throws IOException {
-        boolean loadFromFile = false;
-        try {
-            RESULT = loadFromFile(fileName);
-            loadFromFile = true;
-        } catch (Exception e) {
-            logger.debug("Cannot load data from file " + fileName);
+    public static synchronized DataManager getInstance() {
+        if (instance == null) {
+            instance = new DataManager();
         }
-        boolean shouldSave = true;
-        int id = 1;
-        while (true) {
+        return instance;
+    }
+
+    private static final Gson GSON = new Gson();
+    private static final String TEMPLATE = URLs.TEMPLATE;
+
+    private String fileName = "result";
+    private Numbers data;
+
+    public Numbers getData() {
+        return this.data;
+    }
+
+    private URI getGzipFilePath() throws URISyntaxException {
+        return DataManager.class.getResource("/data/" + fileName + ".gzip").toURI();
+    }
+
+    private URI getJsonFilePath() throws URISyntaxException {
+        return DataManager.class.getResource("/data/" + fileName + ".json").toURI();
+    }
+
+    public DataManager downloadData() throws IOException, URISyntaxException {
+        for(int id = 1 ; id < 7; ++id) {
             String url = String.format(TEMPLATE, id);
-            OkHttpClient client = new OkHttpClient().newBuilder().build();
-            Request request = new Request.Builder().url(url).method("GET", null).build();
-            Response response = client.newCall(request).execute();
-            if (!response.isSuccessful()) {
+            Response response = HttpAdapter.get(url, null, null);
+            Numbers responseData = GSON.fromJson(new InputStreamReader(response.body().byteStream()), Numbers.class);
+            if (id == 1 && data != null && data.getDrawGameId().equals(responseData.getDrawGameId())) {
                 break;
             }
-            JsonElement jsonElement = JsonParser.parseString(response.body().string());
-            Numbers responseData = gson.fromJson(jsonElement, Numbers.class);
-            if (responseData.getMostRecentDraw() == null) {
+            if (data != null && (data.getTotalPreviousDraws() == data.getPreviousDraws().size())) {
                 break;
             }
-            if (loadFromFile && RESULT != null && RESULT.getNextDraw() != null
-                    && RESULT.getNextDraw().getDrawDate().equals(responseData.getNextDraw().getDrawDate())) {
-                shouldSave = false;
-                break;
-            }
-            if (id == 1) {
-                RESULT = responseData;
+            if (id == 1 || data == null) {
+                data = responseData;
             } else {
-                RESULT.getPreviousDraws().addAll(responseData.getPreviousDraws());
+                data.getPreviousDraws().addAll(responseData.getPreviousDraws());
             }
-            ++id;
         }
-        if (shouldSave) {
-            saveToFile(fileName, RESULT);
-        }
-        logger.info("Data download DONE");
-    }
-
-    public static void saveToFile(String fileName, Object obj) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName));
-        bufferedWriter.write(gson.toJson(obj));
-        bufferedWriter.close();
-        logger.debug("Object is writen to " + fileName);
-    }
-
-    public static Numbers loadFromFile(String fileName) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
-        RESULT = gson.fromJson(bufferedReader, Numbers.class);
-        bufferedReader.close();
-        return RESULT;
+        FileIO.saveAsJson(getGzipFilePath(), data);
+        FileIO.saveAsJson(getJsonFilePath(), data);
+        log.info("Data download DONE");
+        return this;
     }
 }

@@ -4,33 +4,27 @@
 package number;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.LinkedList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.apachecommons.CommonsLog;
 import number.algorithms.BuildRelation;
 import number.data.DataManager;
-import number.models.Numbers;
+import number.models.number.Numbers;
 
+@CommonsLog
 public class App {
-    private static Logger logger = LoggerFactory.getLogger(App.class);
-
-    public static void main(String[] args) {
-        logger.info("START");
+    public static void main(String[] args) throws URISyntaxException {
+        log.info("START");
         try {
-            Numbers numbers = DataManager.getData("result.json");
+            Numbers numbers = DataManager.getInstance().downloadData().getData();
             BuildRelation buildRelation = new BuildRelation(numbers);
-            LinkedList<int[]> list = buildRelation.getList();
-            for(int[] i : list) {
-                System.out.println(Arrays.toString(i));
-            }
-            System.out.println("Nums count: " + buildRelation.getCountNums());
-            System.out.println("Mega count: " + buildRelation.getCountMega());
+            buildRelation.getList().forEach(item -> log.info(Arrays.toString(item)));
+            log.info("Nums count: " + buildRelation.getCountNums());
+            log.info("Mega count: " + buildRelation.getCountMega());
         } catch (IOException e) {
-            logger.info(e.getLocalizedMessage());
+            log.info(e.getLocalizedMessage());
         }
-        logger.info("DONE");
+        log.info("DONE");
     }
 }
